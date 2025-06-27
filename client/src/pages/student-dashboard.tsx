@@ -45,7 +45,7 @@ export default function StudentDashboard() {
   // Create timetable grid
   const createTimetableGrid = () => {
     const grid: Record<string, Record<number, TimetableSlotWithDetails[]>> = {};
-    
+
     TIME_SLOTS.forEach(timeSlot => {
       grid[timeSlot] = {};
       DAYS_OF_WEEK.forEach(day => {
@@ -103,7 +103,7 @@ export default function StudentDashboard() {
             <label className="text-sm font-medium text-slate-700">Select Division:</label>
             <Select value={selectedDivision} onValueChange={setSelectedDivision}>
               <SelectTrigger className="w-[300px]">
-                <SelectValue placeholder="Choose your division" />
+                <SelectValue placeholder="Select Division" />
               </SelectTrigger>
               <SelectContent>
                 {divisions.map((division) => (
@@ -160,7 +160,7 @@ export default function StudentDashboard() {
                     {TIME_SLOTS.map((timeSlot, timeIndex) => {
                       // Add break time after 11:00 - 12:00
                       const isBreakAfter = timeSlot === "11:00 - 12:00";
-                      
+
                       return (
                         <>
                           <tr key={timeSlot}>
@@ -171,7 +171,7 @@ export default function StudentDashboard() {
                             </td>
                             {DAYS_OF_WEEK.slice(0, 5).map((day) => {
                               const slots = timetableGrid[timeSlot]?.[day.value] || [];
-                              
+
                               return (
                                 <td key={day.value} className="p-3 border-r border-slate-200">
                                   {slots.length > 0 ? (

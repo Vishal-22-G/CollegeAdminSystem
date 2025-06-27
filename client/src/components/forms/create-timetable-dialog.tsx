@@ -121,7 +121,7 @@ export function CreateTimetableDialog({ open, onOpenChange }: CreateTimetableDia
                     <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select a division" />
+                          <SelectValue placeholder="Select Division" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -147,7 +147,7 @@ export function CreateTimetableDialog({ open, onOpenChange }: CreateTimetableDia
                     <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select faculty" />
+                          <SelectValue placeholder="Select Faculty" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -172,7 +172,7 @@ export function CreateTimetableDialog({ open, onOpenChange }: CreateTimetableDia
                     <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select subject" />
+                          <SelectValue placeholder="Select Subject" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>

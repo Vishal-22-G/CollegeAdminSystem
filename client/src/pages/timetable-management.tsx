@@ -47,7 +47,7 @@ export default function TimetableManagement() {
   // Create timetable grid
   const createTimetableGrid = () => {
     const grid: Record<string, Record<number, TimetableSlotWithDetails[]>> = {};
-    
+
     TIME_SLOTS.forEach(timeSlot => {
       grid[timeSlot] = {};
       DAYS_OF_WEEK.forEach(day => {
@@ -108,7 +108,7 @@ export default function TimetableManagement() {
                   <SelectItem value="faculty">View by Faculty</SelectItem>
                 </SelectContent>
               </Select>
-              
+
               <Select value={selectedDivision} onValueChange={setSelectedDivision}>
                 <SelectTrigger className="w-[280px]">
                   <SelectValue placeholder="Select division" />
@@ -122,7 +122,7 @@ export default function TimetableManagement() {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div className="flex space-x-3">
               <Button variant="outline">
                 <Share className="w-4 h-4 mr-2" />
@@ -152,7 +152,7 @@ export default function TimetableManagement() {
             </p>
           )}
         </CardHeader>
-        
+
         {selectedDivisionData ? (
           <CardContent className="p-0">
             <div className="overflow-x-auto">
@@ -179,7 +179,7 @@ export default function TimetableManagement() {
                       </td>
                       {DAYS_OF_WEEK.slice(0, 5).map((day) => {
                         const slots = timetableGrid[timeSlot]?.[day.value] || [];
-                        
+
                         return (
                           <td key={day.value} className="p-2 border-r border-slate-200">
                             {slots.length > 0 ? (

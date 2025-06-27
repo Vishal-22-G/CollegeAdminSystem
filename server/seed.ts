@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { faculty, subjects, divisions, workloadAssignments } from "@shared/schema";
+import { faculty, subjects, divisions, workloadAssignments, timetableSlots } from "@shared/schema";
 
 async function seedDatabase() {
   console.log("Seeding database...");
