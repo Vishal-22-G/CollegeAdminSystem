@@ -1,96 +1,60 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Search, Filter } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Search, User, BookOpen, MapPin } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import type { WorkloadAssignmentWithDetails } from "@shared/schema";
+import type { Faculty, Subject, Division, WorkloadAssignmentWithDetails } from "@shared/schema";
 
 export default function FacultyTracker() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-  const [departmentFilter, setDepartmentFilter] = useState("");
+  const [departmentFilter, setDepartmentFilter] = useState("all");
+  const [subjectFilter, setSubjectFilter] = useState("all");
 
-  const { data: assignments = [], isLoading } = useQuery<WorkloadAssignmentWithDetails[]>({
+  const { data: faculty, isLoading: facultyLoading } = useQuery<Faculty[]>({
+    queryKey: ["/api/faculty"],
+  });
+
+  const { data: subjects } = useQuery<Subject[]>({
+    queryKey: ["/api/subjects"],
+  });
+
+  const { data: divisions } = useQuery<Division[]>({
+    queryKey: ["/api/divisions"],
+  });
+
+  const { data: workloadAssignments } = useQuery<WorkloadAssignmentWithDetails[]>({
     queryKey: ["/api/workload-assignments"],
   });
 
-  const filteredAssignments = assignments.filter((assignment) => {
-    const matchesSearch = 
-      assignment.faculty.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      assignment.subject.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      assignment.division.name.toLowerCase().includes(searchTerm.toLowerCase());
+  const getAssignmentsForFaculty = (facultyId: number) => {
+    return workloadAssignments?.filter(a => a.facultyId === facultyId) || [];
+  };
+
+  const getCompletionStatus = (assignments: WorkloadAssignmentWithDetails[]) => {
+    if (assignments.length === 0) return { label: "No Tasks", variant: "secondary" as const };
+    const completed = assignments.filter(a => a.status === "completed").length;
+    const total = assignments.length;
+    const percentage = (completed / total) * 100;
     
-    const matchesStatus = !statusFilter || assignment.status === statusFilter;
-    const matchesDepartment = !departmentFilter || assignment.faculty.department === departmentFilter;
-    
-    return matchesSearch && matchesStatus && matchesDepartment;
+    if (percentage === 100) return { label: "All Complete", variant: "default" as const };
+    if (percentage >= 50) return { label: "In Progress", variant: "outline" as const };
+    return { label: "Pending", variant: "destructive" as const };
+  };
+
+  const filteredFaculty = faculty?.filter((f) => {
+    const assignments = getAssignmentsForFaculty(f.id);
+    const matchesSearch = f.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesDepartment = departmentFilter === "all" || f.department === departmentFilter;
+    const matchesSubject = subjectFilter === "all" || assignments.some(a => a.subjectId.toString() === subjectFilter);
+    return matchesSearch && matchesDepartment && matchesSubject;
   });
 
-  const getStatusVariant = (status: string) => {
-    switch (status) {
-      case 'completed': return 'default';
-      case 'pending': return 'secondary';
-      case 'assigned': return 'outline';
-      default: return 'outline';
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed': return 'text-cms-success';
-      case 'pending': return 'text-cms-warning';
-      case 'assigned': return 'text-cms-primary';
-      default: return 'text-slate-500';
-    }
-  };
-
-  // Group assignments by faculty
-  const assignmentsByFaculty = filteredAssignments.reduce((acc, assignment) => {
-    const facultyId = assignment.faculty.id;
-    if (!acc[facultyId]) {
-      acc[facultyId] = {
-        faculty: assignment.faculty,
-        assignments: [],
-        totalHours: 0,
-        completedHours: 0,
-      };
-    }
-    acc[facultyId].assignments.push(assignment);
-    acc[facultyId].totalHours += assignment.hoursPerWeek;
-    if (assignment.status === 'completed') {
-      acc[facultyId].completedHours += assignment.hoursPerWeek;
-    }
-    return acc;
-  }, {} as Record<number, any>);
-
-  const uniqueDepartments = Array.from(new Set(assignments.map(a => a.faculty.department)));
-
-  if (isLoading) {
-    return (
-      <div className="p-6">
-        <div className="animate-pulse space-y-6">
-          <div className="h-8 bg-slate-200 rounded w-1/3"></div>
-          <div className="h-32 bg-slate-200 rounded-xl"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-64 bg-slate-200 rounded-xl"></div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const uniqueDepartments = Array.from(new Set(faculty?.map(f => f.department) || []));
 
   return (
     <div className="p-6">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-slate-900">Faculty Tracker</h2>
-        <p className="text-slate-600 mt-1">Track faculty assignments and completion status</p>
-      </div>
-
       {/* Filters */}
       <Card className="mb-6">
         <CardContent className="p-6">
@@ -98,7 +62,7 @@ export default function FacultyTracker() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
               <Input
-                placeholder="Search by faculty, subject, or division..."
+                placeholder="Search by staff name..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -106,28 +70,28 @@ export default function FacultyTracker() {
             </div>
             
             <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-48">
                 <SelectValue placeholder="All Departments" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Departments</SelectItem>
+                <SelectItem value="all">All Departments</SelectItem>
                 {uniqueDepartments.map((dept) => (
-                  <SelectItem key={dept} value={dept}>
-                    {dept}
-                  </SelectItem>
+                  <SelectItem key={dept} value={dept}>{dept}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[150px]">
-                <SelectValue placeholder="All Status" />
+            <Select value={subjectFilter} onValueChange={setSubjectFilter}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="All Subjects" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Status</SelectItem>
-                <SelectItem value="assigned">Assigned</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="all">All Subjects</SelectItem>
+                {subjects?.map((subject) => (
+                  <SelectItem key={subject.id} value={subject.id.toString()}>
+                    {subject.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -135,91 +99,94 @@ export default function FacultyTracker() {
       </Card>
 
       {/* Faculty Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {Object.values(assignmentsByFaculty).map((facultyData: any) => {
-          const completionPercentage = facultyData.totalHours > 0 
-            ? (facultyData.completedHours / facultyData.totalHours) * 100 
-            : 0;
-
-          return (
-            <Card key={facultyData.faculty.id}>
-              <CardHeader>
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-cms-primary rounded-full flex items-center justify-center">
-                    <span className="text-white font-medium">
-                      {facultyData.faculty.name.split(' ').map((n: string) => n[0]).join('').toUpperCase()}
-                    </span>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {facultyLoading ? (
+          Array.from({ length: 6 }).map((_, i) => (
+            <Card key={i} className="animate-pulse">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 bg-slate-200 rounded-full"></div>
+                    <div>
+                      <div className="h-5 bg-slate-200 rounded w-32 mb-2"></div>
+                      <div className="h-4 bg-slate-200 rounded w-40"></div>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <CardTitle className="text-lg">{facultyData.faculty.name}</CardTitle>
-                    <p className="text-sm text-slate-500">
-                      {facultyData.faculty.position.replace('_', ' ')} • {facultyData.faculty.department}
-                    </p>
-                  </div>
+                  <div className="h-6 bg-slate-200 rounded w-20"></div>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {/* Progress Overview */}
-                  <div>
-                    <div className="flex justify-between text-sm mb-2">
-                      <span>Completion Progress</span>
-                      <span>{Math.round(completionPercentage)}%</span>
-                    </div>
-                    <Progress value={completionPercentage} className="h-2" />
-                  </div>
-
-                  {/* Workload Summary */}
-                  <div className="grid grid-cols-2 gap-4 text-center">
-                    <div className="p-3 bg-slate-50 rounded-lg">
-                      <div className="text-2xl font-bold text-slate-900">{facultyData.totalHours}</div>
-                      <div className="text-xs text-slate-500">Total Hours</div>
-                    </div>
-                    <div className="p-3 bg-slate-50 rounded-lg">
-                      <div className="text-2xl font-bold text-cms-success">{facultyData.completedHours}</div>
-                      <div className="text-xs text-slate-500">Completed</div>
-                    </div>
-                  </div>
-
-                  {/* Recent Assignments */}
-                  <div>
-                    <h4 className="font-medium text-slate-900 mb-2">Recent Assignments</h4>
-                    <div className="space-y-2">
-                      {facultyData.assignments.slice(0, 3).map((assignment: WorkloadAssignmentWithDetails) => (
-                        <div key={assignment.id} className="flex items-center justify-between p-2 bg-slate-50 rounded">
-                          <div className="flex-1">
-                            <p className="text-sm font-medium text-slate-900">{assignment.subject.name}</p>
-                            <p className="text-xs text-slate-500">
-                              {assignment.type} • {assignment.hoursPerWeek}h/week
-                            </p>
-                          </div>
-                          <Badge variant={getStatusVariant(assignment.status)} className="ml-2">
-                            {assignment.status}
-                          </Badge>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                <div className="space-y-3">
+                  <div className="h-4 bg-slate-200 rounded"></div>
+                  <div className="h-4 bg-slate-200 rounded"></div>
+                  <div className="h-4 bg-slate-200 rounded w-3/4"></div>
                 </div>
               </CardContent>
             </Card>
-          );
-        })}
-      </div>
+          ))
+        ) : (
+          filteredFaculty?.map((f) => {
+            const assignments = getAssignmentsForFaculty(f.id);
+            const completionStatus = getCompletionStatus(assignments);
+            const completedTasks = assignments.filter(a => a.status === "completed").length;
+            const totalTasks = assignments.length;
 
-      {Object.keys(assignmentsByFaculty).length === 0 && (
-        <Card>
-          <CardContent className="p-12 text-center">
-            <Filter className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-slate-900 mb-2">No assignments found</h3>
-            <p className="text-slate-500">
-              {searchTerm || statusFilter || departmentFilter
-                ? "Try adjusting your filters to see more results."
-                : "No workload assignments have been created yet."}
-            </p>
-          </CardContent>
-        </Card>
-      )}
+            return (
+              <Card key={f.id} className="hover:shadow-md transition-shadow">
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                        <span className="text-white font-medium">
+                          {f.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
+                        </span>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-slate-900">{f.name}</h3>
+                        <p className="text-sm text-slate-500">{f.email}</p>
+                      </div>
+                    </div>
+                    <Badge variant={completionStatus.variant}>
+                      {completionStatus.label}
+                    </Badge>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center text-sm text-slate-600">
+                      <User className="w-4 h-4 mr-2" />
+                      <span className="capitalize">{f.position.replace('_', ' ')}</span>
+                      <span className="mx-2">•</span>
+                      <span>{f.department}</span>
+                    </div>
+
+                    <div className="flex items-center text-sm text-slate-600">
+                      <BookOpen className="w-4 h-4 mr-2" />
+                      <span>{completedTasks} of {totalTasks} tasks completed</span>
+                    </div>
+
+                    {assignments.length > 0 && (
+                      <div className="mt-4">
+                        <div className="text-xs font-medium text-slate-500 mb-2">Recent Assignments:</div>
+                        <div className="space-y-1">
+                          {assignments.slice(0, 3).map((assignment) => (
+                            <div key={assignment.id} className="flex items-center justify-between text-xs">
+                              <span className="text-slate-600">{assignment.subject.name}</span>
+                              <Badge size="sm" variant={assignment.status === 'completed' ? 'default' : 'outline'}>
+                                {assignment.status}
+                              </Badge>
+                            </div>
+                          ))}
+                          {assignments.length > 3 && (
+                            <div className="text-xs text-slate-400">+{assignments.length - 3} more...</div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })
+        )}
+      </div>
     </div>
   );
 }
