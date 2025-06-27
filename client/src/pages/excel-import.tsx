@@ -56,10 +56,11 @@ export default function ExcelImport() {
       };
       
       const res = await apiRequest("POST", "/api/excel-uploads", uploadData);
+      const uploadResult = await res.json();
       
       // Simulate processing delay
       setTimeout(async () => {
-        await apiRequest("PATCH", `/api/excel-uploads/${(await res.json()).id}/status`, {
+        await apiRequest("PATCH", `/api/excel-uploads/${uploadResult.id}/status`, {
           status: "completed",
           processedRows: Math.floor(Math.random() * 1000) + 100,
           totalRows: Math.floor(Math.random() * 1000) + 100,
@@ -67,7 +68,7 @@ export default function ExcelImport() {
         queryClient.invalidateQueries({ queryKey: ["/api/excel-uploads"] });
       }, 2000);
       
-      return res.json();
+      return uploadResult;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/excel-uploads"] });
@@ -251,15 +252,15 @@ export default function ExcelImport() {
                     <div>
                       <h4 className="font-medium text-slate-900">{upload.originalName}</h4>
                       <p className="text-sm text-slate-500">
-                        {upload.totalRows > 0 ? `${upload.processedRows}/${upload.totalRows} rows` : formatFileSize(upload.fileSize)} • 
+                        {upload.totalRows && upload.totalRows > 0 ? `${upload.processedRows || 0}/${upload.totalRows} rows` : formatFileSize(upload.fileSize)} • 
                         Uploaded {formatUploadTime(upload.uploadedAt)}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Badge variant={getStatusVariant(upload.status)}>
-                      {upload.status === 'processing' && upload.totalRows > 0 ? 
-                        `${Math.round((upload.processedRows / upload.totalRows) * 100)}%` : 
+                      {upload.status === 'processing' && upload.totalRows && upload.totalRows > 0 ? 
+                        `${Math.round(((upload.processedRows || 0) / upload.totalRows) * 100)}%` : 
                         upload.status}
                     </Badge>
                     <Button variant="ghost" size="sm">
