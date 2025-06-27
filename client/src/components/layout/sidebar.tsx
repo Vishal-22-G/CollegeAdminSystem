@@ -35,15 +35,13 @@ export function Sidebar() {
             const isActive = location === item.path;
             
             return (
-              <Link key={item.id} href={item.path}>
-                <a className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
-                  isActive 
-                    ? 'bg-cms-primary/10 text-cms-primary font-medium' 
-                    : 'text-slate-700 hover:bg-slate-100'
-                }`}>
-                  <Icon className="w-5 h-5" />
-                  <span>{item.label}</span>
-                </a>
+              <Link key={item.id} href={item.path} className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
+                isActive 
+                  ? 'bg-cms-primary/10 text-cms-primary font-medium' 
+                  : 'text-slate-700 hover:bg-slate-100'
+              }`}>
+                <Icon className="w-5 h-5" />
+                <span>{item.label}</span>
               </Link>
             );
           })}

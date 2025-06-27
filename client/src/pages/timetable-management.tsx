@@ -39,7 +39,6 @@ export default function TimetableManagement() {
   });
 
   const { data: timetableSlots = [], isLoading: slotsLoading } = useQuery<TimetableSlotWithDetails[]>({
-    queryKey: ["/api/timetable", selectedDivision ? { divisionId: selectedDivision } : {}],
     queryKey: selectedDivision ? ["/api/timetable", { divisionId: selectedDivision }] : ["/api/timetable"],
   });
 
