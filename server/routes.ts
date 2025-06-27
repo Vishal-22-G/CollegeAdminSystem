@@ -302,6 +302,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/excel-uploads/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      // For now, we'll just mark as deleted since we don't have a delete method in storage
+      const upload = await storage.updateExcelUploadStatus(id, "deleted");
+      if (upload) {
+        res.json({ message: "Upload deleted successfully" });
+      } else {
+        res.status(404).json({ message: "Upload not found" });
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete upload" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

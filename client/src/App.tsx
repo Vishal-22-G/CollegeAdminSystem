@@ -12,6 +12,7 @@ import WorkloadManagement from "@/pages/workload-management";
 import FacultyTracker from "@/pages/faculty-tracker";
 import TimetableManagement from "@/pages/timetable-management";
 import ExcelImport from "@/pages/excel-import";
+import ExcelDataViewer from "@/pages/excel-data";
 import StudentDashboard from "@/pages/student-dashboard";
 import NotFound from "@/pages/not-found";
 
@@ -46,6 +47,9 @@ function Router() {
           <Route path="/excel">
             <Header title="Excel Data Import" description="Upload and process Excel files for bulk data operations" />
             <ExcelImport />
+          </Route>
+          <Route path="/excel-data/:id">
+            <ExcelDataViewer />
           </Route>
           <Route path="/student">
             <Header title="Student Timetable View" description="View your class schedule and room assignments" />

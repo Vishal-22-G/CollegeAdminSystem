@@ -43,9 +43,12 @@ export default function ExcelImport() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: uploads = [], isLoading } = useQuery<ExcelUpload[]>({
+  const { data: allUploads = [], isLoading } = useQuery<ExcelUpload[]>({
     queryKey: ["/api/excel-uploads"],
   });
+
+  // Filter out deleted uploads
+  const uploads = allUploads.filter(upload => upload.status !== "deleted");
 
   const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
@@ -82,6 +85,23 @@ export default function ExcelImport() {
       toast({ 
         title: "Error", 
         description: "Failed to upload file",
+        variant: "destructive"
+      });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest("DELETE", `/api/excel-uploads/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/excel-uploads"] });
+      toast({ title: "Success", description: "Upload deleted successfully" });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete upload",
         variant: "destructive"
       });
     },
@@ -263,10 +283,21 @@ export default function ExcelImport() {
                         `${Math.round(((upload.processedRows || 0) / upload.totalRows) * 100)}%` : 
                         upload.status}
                     </Badge>
-                    <Button variant="ghost" size="sm">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => window.open(`/excel-data/${upload.id}`, '_blank')}
+                      title="View Data"
+                    >
                       <Eye className="w-4 h-4" />
                     </Button>
-                    <Button variant="ghost" size="sm">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => deleteMutation.mutate(upload.id)}
+                      disabled={deleteMutation.isPending}
+                      title="Delete Upload"
+                    >
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
