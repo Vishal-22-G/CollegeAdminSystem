@@ -119,20 +119,20 @@ export function AssignWorkloadDialog({ open, onOpenChange }: AssignWorkloadDialo
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Faculty Member</FormLabel>
-                    <FormControl>
-                      <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
+                    <Select onValueChange={(value) => field.onChange(parseInt(value))}>
+                      <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select faculty member" />
                         </SelectTrigger>
-                      </Select>
-                    </FormControl>
-                    <SelectContent>
-                      {faculty?.map((member) => (
-                        <SelectItem key={member.id} value={member.id.toString()}>
-                          {member.name} - {member.department}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
+                      </FormControl>
+                      <SelectContent>
+                        {faculty?.map((member) => (
+                          <SelectItem key={member.id} value={member.id.toString()}>
+                            {member.name} - {member.department}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

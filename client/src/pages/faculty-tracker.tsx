@@ -169,7 +169,7 @@ export default function FacultyTracker() {
                           {assignments.slice(0, 3).map((assignment) => (
                             <div key={assignment.id} className="flex items-center justify-between text-xs">
                               <span className="text-slate-600">{assignment.subject.name}</span>
-                              <Badge size="sm" variant={assignment.status === 'completed' ? 'default' : 'outline'}>
+                              <Badge variant={assignment.status === 'completed' ? 'default' : 'outline'}>
                                 {assignment.status}
                               </Badge>
                             </div>

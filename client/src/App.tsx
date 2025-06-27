@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
+import { AuthProvider, useAuth } from "@/contexts/auth-context";
+import { LoginDialog } from "@/components/auth/login-dialog";
 import Dashboard from "@/pages/dashboard";
 import WorkloadManagement from "@/pages/workload-management";
 import FacultyTracker from "@/pages/faculty-tracker";
@@ -14,6 +16,12 @@ import StudentDashboard from "@/pages/student-dashboard";
 import NotFound from "@/pages/not-found";
 
 function Router() {
+  const { isAuthenticated, login } = useAuth();
+
+  if (!isAuthenticated) {
+    return <LoginDialog open={true} onSuccess={login} />;
+  }
+
   return (
     <div className="min-h-screen flex bg-slate-50">
       <Sidebar />
@@ -54,8 +62,10 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
-        <Router />
+        <AuthProvider>
+          <Toaster />
+          <Router />
+        </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );
