@@ -5,13 +5,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Faculty, Subject, Division, WorkloadAssignment } from "@/lib/types";
+import type { Faculty, Subject, Division, WorkloadAssignment } from "@shared/schema";
 import { Search, User, BookOpen, MapPin } from "lucide-react";
 
 export default function FacultyTracker() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [departmentFilter, setDepartmentFilter] = useState("");
-  const [subjectFilter, setSubjectFilter] = useState("");
+  const [departmentFilter, setDepartmentFilter] = useState("all");
+  const [subjectFilter, setSubjectFilter] = useState("all");
 
   const { data: faculty, isLoading: facultyLoading } = useQuery<Faculty[]>({
     queryKey: ["/api/faculty"],
@@ -55,8 +55,8 @@ export default function FacultyTracker() {
   const filteredFaculty = faculty?.filter((f) => {
     const assignments = getAssignmentsForFaculty(f.id);
     const matchesSearch = f.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesDepartment = !departmentFilter || f.department === departmentFilter;
-    const matchesSubject = !subjectFilter || assignments.some(a => a.subjectId.toString() === subjectFilter);
+    const matchesDepartment = departmentFilter === "all" || f.department === departmentFilter;
+    const matchesSubject = subjectFilter === "all" || assignments.some(a => a.subjectId.toString() === subjectFilter);
     return matchesSearch && matchesDepartment && matchesSubject;
   });
 
@@ -83,7 +83,7 @@ export default function FacultyTracker() {
                 <SelectValue placeholder="All Departments" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Departments</SelectItem>
+                <SelectItem value="all">All Departments</SelectItem>
                 {uniqueDepartments.map((dept) => (
                   <SelectItem key={dept} value={dept}>{dept}</SelectItem>
                 ))}
@@ -95,7 +95,7 @@ export default function FacultyTracker() {
                 <SelectValue placeholder="All Subjects" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Subjects</SelectItem>
+                <SelectItem value="all">All Subjects</SelectItem>
                 {subjects?.map((subject) => (
                   <SelectItem key={subject.id} value={subject.id.toString()}>
                     {subject.name}

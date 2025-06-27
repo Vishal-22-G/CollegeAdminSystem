@@ -13,8 +13,8 @@ import type { Faculty } from "@shared/schema";
 export default function WorkloadManagement() {
   const [assignWorkloadOpen, setAssignWorkloadOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [departmentFilter, setDepartmentFilter] = useState("");
-  const [positionFilter, setPositionFilter] = useState("");
+  const [departmentFilter, setDepartmentFilter] = useState("all");
+  const [positionFilter, setPositionFilter] = useState("all");
 
   const { data: facultyList = [], isLoading } = useQuery<Faculty[]>({
     queryKey: ["/api/faculty"],
@@ -23,8 +23,8 @@ export default function WorkloadManagement() {
   const filteredFaculty = facultyList.filter((faculty) => {
     const matchesSearch = faculty.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          faculty.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesDepartment = !departmentFilter || faculty.department === departmentFilter;
-    const matchesPosition = !positionFilter || faculty.position === positionFilter;
+    const matchesDepartment = departmentFilter === "all" || faculty.department === departmentFilter;
+    const matchesPosition = positionFilter === "all" || faculty.position === positionFilter;
     
     return matchesSearch && matchesDepartment && matchesPosition;
   });
@@ -82,7 +82,7 @@ export default function WorkloadManagement() {
                   <SelectValue placeholder="All Departments" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Departments</SelectItem>
+                  <SelectItem value="all">All Departments</SelectItem>
                   {uniqueDepartments.map((dept) => (
                     <SelectItem key={dept} value={dept}>
                       {dept}
@@ -96,7 +96,7 @@ export default function WorkloadManagement() {
                   <SelectValue placeholder="All Positions" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Positions</SelectItem>
+                  <SelectItem value="all">All Positions</SelectItem>
                   {uniquePositions.map((position) => (
                     <SelectItem key={position} value={position}>
                       {position.replace('_', ' ')}
