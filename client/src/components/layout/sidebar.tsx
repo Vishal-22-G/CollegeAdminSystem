@@ -27,13 +27,13 @@ export function Sidebar() {
           </div>
         </div>
       </div>
-      
+
       <nav className="flex-1 p-4">
         <div className="space-y-2">
           {NAVIGATION_ITEMS.map((item) => {
             const Icon = iconMap[item.icon as keyof typeof iconMap];
             const isActive = location === item.path;
-            
+
             return (
               <Link key={item.id} href={item.path} className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
                 isActive 
@@ -46,19 +46,19 @@ export function Sidebar() {
             );
           })}
         </div>
-        
+
         <div className="mt-8 pt-4 border-t border-slate-200">
           <div className="px-3 py-2">
             <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">Account</p>
           </div>
-          <a href="#" className="flex items-center space-x-3 px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors">
+          <Link href="#" className="flex items-center space-x-3 px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors">
             <Settings className="w-5 h-5" />
             <span>Settings</span>
-          </a>
-          <a href="#" className="flex items-center space-x-3 px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors">
+          </Link>
+          <Link href="#" className="flex items-center space-x-3 px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors">
             <LogOut className="w-5 h-5" />
             <span>Logout</span>
-          </a>
+          </Link>
         </div>
       </nav>
     </aside>

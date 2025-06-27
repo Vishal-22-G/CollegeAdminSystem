@@ -110,7 +110,7 @@ export function AssignWorkloadDialog({ open, onOpenChange }: AssignWorkloadDialo
             Create a new workload assignment for faculty members.
           </DialogDescription>
         </DialogHeader>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField

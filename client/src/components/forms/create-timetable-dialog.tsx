@@ -109,7 +109,7 @@ export function CreateTimetableDialog({ open, onOpenChange }: CreateTimetableDia
             Add a new slot to the timetable schedule.
           </DialogDescription>
         </DialogHeader>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
