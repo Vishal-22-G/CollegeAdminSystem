@@ -1,4 +1,5 @@
 import { pgTable, text, serial, integer, boolean, varchar, timestamp } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -67,6 +68,52 @@ export const excelUploads = pgTable("excel_uploads", {
   processedRows: integer("processed_rows").default(0),
   totalRows: integer("total_rows").default(0),
 });
+
+// Relations
+export const facultyRelations = relations(faculty, ({ many }) => ({
+  workloadAssignments: many(workloadAssignments),
+  timetableSlots: many(timetableSlots),
+}));
+
+export const subjectsRelations = relations(subjects, ({ many }) => ({
+  workloadAssignments: many(workloadAssignments),
+  timetableSlots: many(timetableSlots),
+}));
+
+export const divisionsRelations = relations(divisions, ({ many }) => ({
+  workloadAssignments: many(workloadAssignments),
+  timetableSlots: many(timetableSlots),
+}));
+
+export const workloadAssignmentsRelations = relations(workloadAssignments, ({ one }) => ({
+  faculty: one(faculty, {
+    fields: [workloadAssignments.facultyId],
+    references: [faculty.id],
+  }),
+  subject: one(subjects, {
+    fields: [workloadAssignments.subjectId],
+    references: [subjects.id],
+  }),
+  division: one(divisions, {
+    fields: [workloadAssignments.divisionId],
+    references: [divisions.id],
+  }),
+}));
+
+export const timetableSlotsRelations = relations(timetableSlots, ({ one }) => ({
+  faculty: one(faculty, {
+    fields: [timetableSlots.facultyId],
+    references: [faculty.id],
+  }),
+  subject: one(subjects, {
+    fields: [timetableSlots.subjectId],
+    references: [subjects.id],
+  }),
+  division: one(divisions, {
+    fields: [timetableSlots.divisionId],
+    references: [divisions.id],
+  }),
+}));
 
 // Insert schemas
 export const insertFacultySchema = createInsertSchema(faculty).omit({ id: true, currentHours: true });
