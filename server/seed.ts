@@ -4,6 +4,14 @@ import { faculty, subjects, divisions, workloadAssignments } from "@shared/schem
 async function seedDatabase() {
   console.log("Seeding database...");
 
+  // Clear existing data first
+  await db.delete(workloadAssignments);
+  await db.delete(timetableSlots);
+  await db.delete(faculty);
+  await db.delete(subjects);
+  await db.delete(divisions);
+  console.log("Cleared existing data");
+
   // Add sample faculty
   const facultyData = [
     {

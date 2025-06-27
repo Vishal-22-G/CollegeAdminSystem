@@ -114,29 +114,29 @@ export function AssignWorkloadDialog({ open, onOpenChange }: AssignWorkloadDialo
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
-              control={form.control}
-              name="facultyId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Faculty</FormLabel>
-                  <Select onValueChange={(value) => field.onChange(parseInt(value))}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select faculty" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {faculty.map((f) => (
-                        <SelectItem key={f.id} value={f.id.toString()}>
-                          {f.name} - {f.position}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                control={form.control}
+                name="facultyId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Faculty Member</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select faculty member" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {faculty?.map((member) => (
+                          <SelectItem key={member.id} value={member.id.toString()}>
+                            {member.name} - {member.department}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
             <FormField
               control={form.control}

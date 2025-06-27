@@ -113,29 +113,29 @@ export function CreateTimetableDialog({ open, onOpenChange }: CreateTimetableDia
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
-              control={form.control}
-              name="divisionId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Division</FormLabel>
-                  <Select onValueChange={(value) => field.onChange(parseInt(value))}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select division" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {divisions.map((d) => (
-                        <SelectItem key={d.id} value={d.id.toString()}>
-                          {d.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                control={form.control}
+                name="divisionId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Division</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a division" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {divisions?.map((division) => (
+                          <SelectItem key={division.id} value={division.id.toString()}>
+                            {division.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
             <div className="grid grid-cols-2 gap-4">
               <FormField
@@ -144,16 +144,16 @@ export function CreateTimetableDialog({ open, onOpenChange }: CreateTimetableDia
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Faculty</FormLabel>
-                    <Select onValueChange={(value) => field.onChange(parseInt(value))}>
+                    <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select faculty" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {faculty.map((f) => (
-                          <SelectItem key={f.id} value={f.id.toString()}>
-                            {f.name}
+                        {faculty?.map((member) => (
+                          <SelectItem key={member.id} value={member.id.toString()}>
+                            {member.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -169,16 +169,16 @@ export function CreateTimetableDialog({ open, onOpenChange }: CreateTimetableDia
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Subject</FormLabel>
-                    <Select onValueChange={(value) => field.onChange(parseInt(value))}>
+                    <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select subject" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {subjects.map((s) => (
-                          <SelectItem key={s.id} value={s.id.toString()}>
-                            {s.name}
+                        {subjects?.map((subject) => (
+                          <SelectItem key={subject.id} value={subject.id.toString()}>
+                            {subject.name} ({subject.code})
                           </SelectItem>
                         ))}
                       </SelectContent>

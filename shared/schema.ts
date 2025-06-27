@@ -25,14 +25,17 @@ export const subjects = pgTable("subjects", {
   code: text("code").notNull().unique(),
   department: text("department").notNull(),
   credits: integer("credits").notNull(),
+  semester: integer("semester").notNull(),
 });
 
 export const divisions = pgTable("divisions", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
+  code: text("code").notNull().unique(),
   department: text("department").notNull(),
   semester: integer("semester").notNull(),
   academicYear: text("academic_year").notNull(),
+  studentCount: integer("student_count").default(0),
 });
 
 export const workloadAssignments = pgTable("workload_assignments", {
